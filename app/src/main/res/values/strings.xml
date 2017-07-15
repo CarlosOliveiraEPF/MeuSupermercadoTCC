@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MeuSupermercadoTCC</string>
+    <string name="title_activity_main">MeuSupermercado</string>
+    <string name="title_activity_estabelecimento">Estabelecimento</string>
+</resources>
