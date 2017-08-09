@@ -2,4 +2,9 @@
     <string name="app_name">MeuSupermercadoTCC</string>
     <string name="title_activity_main">MeuSupermercado</string>
     <string name="title_activity_estabelecimento">Estabelecimento</string>
+    <string name="title_activity_cliente">Área Cliente</string>
+    <string name="title_activity_perfil">Perfil</string>
+    <string name="title_activity_lista_compra">Lista de Compras</string>
+    <string name="title_activity_orcamento">Orçamento</string>
+    <string name="title_activity_pedido">Meus Pedidos</string>
 </resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "470565879969",
+    "firebase_url": "https://meusupermercadotcc.firebaseio.com",
+    "project_id": "meusupermercadotcc",
+    "storage_bucket": "meusupermercadotcc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470565879969:android:3cb1a0bae8534d7f",
+        "android_client_info": {
+          "package_name": "com.example.carlosoliveira.meusupermercadotcc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470565879969-e0hhjj7rqrj4lr4cn0o10u803fc48uo0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.carlosoliveira.meusupermercadotcc",
+            "certificate_hash": "d0f55418773c7e8c7d7b6a166e9e74e2a9f1f433"
+          }
+        },
+        {
+          "client_id": "470565879969-51drdnkc70q554jo5t60tphq0f5kep70.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFFWVprcJ_ktBFKaDB3ShzrTf4tt3oQtA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470565879969-51drdnkc70q554jo5t60tphq0f5kep70.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

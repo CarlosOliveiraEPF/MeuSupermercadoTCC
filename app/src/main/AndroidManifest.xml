@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.carlosoliveira.meusupermercadotcc">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
+        android:name=".screens.Global"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,9 +23,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".screens.EstabelecimentoActivity"
-            android:label="@string/title_activity_estabelecimento">
+        <activity
+            android:name=".screens.EstabelecimentoActivity"
+            android:label="@string/title_activity_estabelecimento" />
+        <activity android:name=".screens.ClienteActivity" />
+        <activity
+            android:name=".screens.PerfilActivity"
+            android:label="@string/title_activity_perfil"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".screens.ListaCompraActivity"
+            android:label="@string/title_activity_lista_compra"
+            android:parentActivityName=".screens.ClienteActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.carlosoliveira.meusupermercadotcc.screens.ClienteActivity" />
+        </activity>
+        <activity android:name=".screens.AddProdutoActivity" />
+        <activity
+            android:name=".screens.OrcamentoActivity"
+            android:label="@string/title_activity_orcamento"
+            android:parentActivityName=".screens.ClienteActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.carlosoliveira.meusupermercadotcc.screens.ClienteActivity" />
+        </activity>
+        <activity android:name=".screens.PedidosActivity" />
+        <activity android:name=".screens.OrcActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
     </application>
 

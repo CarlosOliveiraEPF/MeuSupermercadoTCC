@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.carlosoliveira.meusupermercadotcc.screens.MainActivity">
+    tools:context="com.example.carlosoliveira.meusupermercadotcc.screens.OrcamentoActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,20 +20,16 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/content_orcamento"
+        android:id="@+id/include" />
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabLogin"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-        app:layout_anchor="@+id/include2"
-        app:layout_anchorGravity="bottom|right"
-        app:srcCompat="@drawable/if_checked" />
-
-    <include
-        android:id="@+id/include2"
-        layout="@layout/content_main"
-        android:layout_height="315dp" />
+        android:visibility="invisible"
+        app:layout_anchor="@+id/include"
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>
