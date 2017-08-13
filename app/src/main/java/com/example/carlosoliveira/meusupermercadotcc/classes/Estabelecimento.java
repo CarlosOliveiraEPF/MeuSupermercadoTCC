@@ -14,6 +14,16 @@ public class Estabelecimento {
     private String numero;
     private String complemento;
 
+    public Estabelecimento() {
+    }
+
+    public Estabelecimento(String id, String nome, String logradouro, String numero) {
+        this.id = id;
+        this.nome = nome;
+        this.logradouro = logradouro;
+        this.numero = numero;
+    }
+
     public String getId() {
         return id;
     }
@@ -72,14 +82,6 @@ public class Estabelecimento {
 
     @Override
     public String toString() {
-        return "Estabelecimento{" +
-                "id='" + id + '\'' +
-                ", nome='" + nome + '\'' +
-                ", site='" + site + '\'' +
-                ", cep='" + cep + '\'' +
-                ", logradouro='" + logradouro + '\'' +
-                ", numero='" + numero + '\'' +
-                ", complemento='" + complemento + '\'' +
-                '}';
+        return nome + " - " + logradouro + " nº "+ numero;
     }
 }

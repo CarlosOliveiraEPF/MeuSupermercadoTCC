@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,12 +38,15 @@ public class ListaCompraActivity extends AppCompatActivity {
     private RequestQueue mVolleyQueue;
     private ArrayList<Produto> produtos = new ArrayList<>();
 
+    private ArrayList<Produto> prodEscolhidos = new ArrayList<>();
+
     @BindView(R.id.refresh)
     public SwipeRefreshLayout mRefresh;
 
     @BindView(R.id.listaprodutos)
     public AdapterView mListView;
 
+    private static final int MENU_COMPRA = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +79,18 @@ public class ListaCompraActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Produto produto = ((ArrayAdapter<Produto>)parent.getAdapter()).getItem(position);
+                prodEscolhidos.add(produto);
+
+                Toast.makeText(getBaseContext(), "Produto selecionado!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
                 Produto produto = ((ArrayAdapter<Produto>)parent.getAdapter()).getItem(position);
                 Intent intent = new Intent(ListaCompraActivity.this, AddProdutoActivity.class);
                 intent.putExtra("key", produto.getId() );
@@ -81,6 +98,8 @@ public class ListaCompraActivity extends AppCompatActivity {
                 intent.putExtra("qtd", produto.getQtd());
                 intent.putExtra("idUser", produto.getIdUser());
                 startActivity(intent);
+
+                return true;
             }
         });
 
@@ -99,15 +118,11 @@ public class ListaCompraActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            //final Global globalVariable = (Global) getApplicationContext();
-                            //Toast.makeText(getBaseContext(),"Chave global 2: "+globalVariable.getIdUser(),Toast.LENGTH_LONG).show();
                             JSONObject jsonObject = new JSONObject( response );
                             jsonObject.toString();
 
                             Iterator<?> keys = jsonObject.keys();
-
                             produtos.clear();
-
                             while( keys.hasNext() ) {
                                 String key = (String)keys.next();
                                 if ( jsonObject.get(key) instanceof JSONObject ) {
@@ -115,19 +130,17 @@ public class ListaCompraActivity extends AppCompatActivity {
                                     String qtd = ((JSONObject) jsonObject.get(key)).get("qtd").toString();
                                     String idUser = ((JSONObject) jsonObject.get(key)).get("idUser").toString();
                                     Produto produto1 = new Produto(key, produto, qtd, idUser);
-                                    //Toast.makeText(ListaCompraActivity.this,"idUser1: "+idUser +"Global Iduser1: "+((Global)getApplication()).getIdUser().toString(),Toast.LENGTH_SHORT).show();
-                                    if (idUser.equals(((Global) getApplication()).getIdUser().toString())) {
-                                        //Toast.makeText(ListaCompraActivity.this,"idUser2: "+idUser +"Global Iduser2: "+((Global)getApplication()).getIdUser().toString(),Toast.LENGTH_SHORT).show();
+                                    if (idUser.equals(((Global) getApplication()).getIdUser())) {
                                         produtos.add(0,produto1);
                                     }
-
                                 }
                             }
                             ArrayAdapter<Produto> adapter = new ArrayAdapter<Produto>(ListaCompraActivity.this,
-                                    android.R.layout.simple_list_item_1, produtos);
+                                    android.R.layout.simple_list_item_multiple_choice, produtos);
                             mListView.setAdapter(adapter);
+
                             mRefresh.setRefreshing(false);
-                            YoYo.with(Techniques.ZoomIn).playOn(mRefresh);
+                            //YoYo.with(Techniques.ZoomIn).playOn(mRefresh);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -140,5 +153,30 @@ public class ListaCompraActivity extends AppCompatActivity {
                     }
                 });
         mVolleyQueue.add(req);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        menu.add(MENU_COMPRA,MENU_COMPRA,10,"Comprar");
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case MENU_COMPRA:
+                if (prodEscolhidos.size()>0){
+                    OrcamentoActivity.prodEscolhidos = prodEscolhidos;
+                    Intent iorcamento = new Intent(ListaCompraActivity.this, OrcamentoActivity.class);
+                    startActivity(iorcamento);
+                    break;
+                }else{
+                    Toast.makeText(ListaCompraActivity.this,"Produtos devem ser selecionados.",Toast.LENGTH_SHORT).show();
+                }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.carlosoliveira.meusupermercadotcc.screens.PerfilActivity"
-    tools:showIn="@layout/activity_perfil">
+    tools:showIn="@layout/activity_perfil"
+    android:background="@drawable/gradiente_fundo">
 
     <TextView
         android:id="@+id/textView8"

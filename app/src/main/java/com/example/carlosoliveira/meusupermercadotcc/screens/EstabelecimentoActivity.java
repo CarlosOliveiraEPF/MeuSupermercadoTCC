@@ -5,6 +5,7 @@ import android.location.Location;
 import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -66,7 +67,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
     private Estabelecimento estabelecimento;
     private DatabaseReference firebase;
     private Button btnSaveEst;
-    private FirebaseAuth mAuth;
+    //private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
 
 
         // setTitle(getResources().getString(R.string.title_activity_estabelecimento));
-        mAuth = FirebaseAuth.getInstance();
+       // mAuth = FirebaseAuth.getInstance();
 
         etCEP = (EditText)findViewById(R.id.edtCepEst);
         etLog = (EditText)findViewById(R.id.edtLogEst);
@@ -97,6 +98,8 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
 
         final ArrayList<Estabelecimento> est = new ArrayList<>();
 
+        //btnSaveEst.setBackgroundResource(R.drawable.if_cancel);
+
         etCEP.setOnFocusChangeListener(new View.OnFocusChangeListener()
         {
             @Override
@@ -104,6 +107,27 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
             {
                 if (!hasFocus){
                     getCEP(etCEP.getText().toString());
+                }
+            }
+        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                estabelecimento = new Estabelecimento();
+                estabelecimento.setNome(etName.getText().toString());
+                estabelecimento.setSite(etSite.getText().toString());
+                estabelecimento.setCep(etCEP.getText().toString());
+                estabelecimento.setLogradouro(etLog.getText().toString());
+                estabelecimento.setNumero(etNumEst.getText().toString());
+                estabelecimento.setComplemento(etComplEst.getText().toString());
+                if(est.isEmpty()) {
+                    salvarEstabelecimento(estabelecimento);
+                    clearEstabelecimento();
+                }else{
+                    estabelecimento.setId(est.get(0).getId());
+                    salvarEstabelecimentoAlterar(estabelecimento);
+                    clearEstabelecimento();
                 }
             }
         });
@@ -227,10 +251,10 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                         etLog.setText(obj.getString("logradouro"));
                         if(etLog.length()<1){
                             Toast.makeText(getBaseContext(), "CEP não especifico de um logradouro. Favor preencher o campo."+statusCode, Toast.LENGTH_LONG).show();
-                        }else{
-                            Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
-                            getEndereco(0,0,etLog.getText().toString());
-                        }
+                        }//else{
+                           // Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
+                            //getEndereco(0,0,etLog.getText().toString());
+                       // }
 //                        retorno += "\n" + obj.getString("cep");
 //                        retorno += "\n" + obj.getString("logradouro");
 //                        retorno += "\n" + obj.getString("complemento");
@@ -267,7 +291,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
             // Lat/Long Rua Ney da Gama Ahrends
             //latitude = -30.045504;
             //longitude = -51.1333411;
-            getEndereco(latitude, longitude, etLog.getText().toString());
+            getEndereco(latitude, longitude);
 
             tvLatitude.setText("Latitude: " + lastLocation.getLatitude());
             tvLongitude.setText("Longitude: " + lastLocation.getLongitude());
@@ -287,14 +311,12 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                 Toast.LENGTH_LONG).show();
     }
 
-    public void getEndereco(double lat, double longi, String logradouro){
+    public void getEndereco(double lat, double longi){
         //http://maps.googleapis.com/maps/api/geocode/json?latlng=-26.196223,-52.689523
         RequestParams params = new RequestParams();
 
         AsyncHttpClient client = new AsyncHttpClient();
-        //if(logradouro.isEmpty()){
 
-        //}
         client.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+longi, params, new TextHttpResponseHandler() {
         //client.get("http://maps.google.com/maps/api/geocode/json?address="+logradouro, params, new TextHttpResponseHandler() {
                     //http://maps.google.com/maps/api/geocode/json?address=rua+ney+gama+ahrends+295+prot%C3%A1sio,+portoalegre+-+rs&sensor=false
@@ -317,7 +339,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                 //aqui que retorna a lat e long.
                 //Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
 
-
+/*
                 try {
                     JSONObject objGps = new JSONObject(responseString);
 
@@ -338,11 +360,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                 }catch(JSONException e){
 
                 }
-
-
-
-
-
+*/
                 Toast.makeText(getBaseContext(),responseString, Toast.LENGTH_LONG).show();
 
                 progress.setVisibility(View.GONE);

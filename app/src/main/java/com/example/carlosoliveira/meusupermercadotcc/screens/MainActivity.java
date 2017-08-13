@@ -7,12 +7,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.carlosoliveira.meusupermercadotcc.BDados.ConfiguraFireBase;
 import com.example.carlosoliveira.meusupermercadotcc.R;
+import com.example.carlosoliveira.meusupermercadotcc.classes.Cliente;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -21,6 +28,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText etEmailUser;
     private Boolean ligaFab=false;
     private String idUser;
+
+    private DatabaseReference firebase;
+    final ArrayList<Cliente> cli = new ArrayList<>();
 
     public String getIdUser() {
         return idUser;
@@ -49,44 +61,75 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        firebase = ConfiguraFireBase.getFirebase().child("cliente");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabLogin);
-        //fab.setVisibility(View.INVISIBLE);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabLogin);
+        final FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fabLogoff);
+        fab2.setVisibility(View.GONE);// INVISIBLE);
 
-//        if (ligaFab){
-//            Toast.makeText(getBaseContext(),"liga..."+etEmailUser.length(),Toast.LENGTH_LONG).show();
-//            fab.setVisibility(View.VISIBLE);
-//        }
-
-        etEmailUser = (EditText)findViewById(R.id.edtUserEmail);
-//        etEmailUser.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus)
-//            {
-//                if ((!hasFocus)&&(etEmailUser.length()>0)){
-//                    ligaFab = true;
-//                    Toast.makeText(getBaseContext(),"Email Usuário preenchido..."+etEmailUser.length(),Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(),"Email Usuário preenchido..."+etEmailUser.getText().toString(),Toast.LENGTH_LONG).show();
-                ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                Toast.makeText(getBaseContext(),"Email global: "+((Global)getApplication()).getEmailuser(),Toast.LENGTH_LONG).show();
+
+                // Trestando a existência do e-mail na base de dados.
+                etEmailUser = (EditText)findViewById(R.id.edtUserEmail);
+
+                firebase.orderByChild("email").equalTo(etEmailUser.getText().toString()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        cli.clear();
+                        for(DataSnapshot data: dataSnapshot.getChildren()){
+                            Cliente c = data.getValue(Cliente.class);
+                            c.setId(data.getKey()); //Colocando key manualmente no objeto
+                            cli.add(c);
+                        }
+                        if(!cli.isEmpty()) {
+                            Log.d("CLIENTES", "CLIENTES: " + cli.get(0).toString());
+                            ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
+                            ((Global) getApplication()).setIdUser(cli.get(0).getId());
+                            //Toast.makeText(getBaseContext(),"Email: "+((Global)getApplication()).getEmailuser()+" Id: "+((Global)getApplication()).getIdUser().toString(),Toast.LENGTH_LONG).show();
+                            Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
+                            startActivity(icliente);
+                            fab.setVisibility(View.GONE);
+                            fab2.setVisibility(View.VISIBLE);
+                            ((Global) getApplication()).setLogin(true);
+
+                        }else{
+                            etEmailUser.setText("");
+                            Toast.makeText(getBaseContext(),"Usuário não cadastrado.",Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etEmailUser.setText("");
+                ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
+                ((Global)getApplication()).setIdUser(etEmailUser.getText().toString());
 
+                Toast.makeText(getBaseContext(),"Você está desconectado.",Toast.LENGTH_LONG).show();
+                fab2.setVisibility(View.GONE);
+                fab.setVisibility(View.VISIBLE);
+                ((Global) getApplication()).setLogin(false);
+            }
 
-        //Inicio AccountHeader
+        });
+
+            //Inicio AccountHeader
         //####################### SÓ O CABEÇALHO #######################
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.meusuper1)
+                .withHeaderBackground(R.drawable.meusuper15famb)
                 .addProfiles(
                         //new ProfileDrawerItem().withName("Thiago Cury").withEmail("thiagocury@gmail.com").withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
                 )
@@ -113,18 +156,22 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
-                        switch ((int)drawerItem.getIdentifier()){
-                            case 0:
-                                Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
-                                startActivity(icliente);
-                                break;
-                            case 1:
-                                Intent iestabelecimento = new Intent(MainActivity.this, EstabelecimentoActivity.class);
-                                startActivity(iestabelecimento);
-                                break;
+                        if (!((Global) getApplication()).getLogin()) {
+                            switch ((int)drawerItem.getIdentifier()){
+                                case 0:
+                                    Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
+                                    startActivity(icliente);
+                                    break;
+                                case 1:
+                                    Intent iestabelecimento = new Intent(MainActivity.this, EstabelecimentoActivity.class);
+                                    startActivity(iestabelecimento);
+                                    break;
+                            }
+                        }else{
+                            Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
                         }
                         return false;
+
                     }
                 }).build();
     }

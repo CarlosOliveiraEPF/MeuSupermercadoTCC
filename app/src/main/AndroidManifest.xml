@@ -51,7 +51,14 @@
                 android:value="com.example.carlosoliveira.meusupermercadotcc.screens.ClienteActivity" />
         </activity>
         <activity android:name=".screens.PedidosActivity" />
-        <activity android:name=".screens.OrcActivity">
+        <activity
+            android:name=".screens.ListaEstabelecimentoActivity"
+            android:label="@string/title_activity_lista_estabelecimento"
+            android:parentActivityName=".screens.OrcamentoActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.carlosoliveira.meusupermercadotcc.screens.OrcamentoActivity" />
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 

@@ -7,4 +7,5 @@
     <string name="title_activity_lista_compra">Lista de Compras</string>
     <string name="title_activity_orcamento">Orçamento</string>
     <string name="title_activity_pedido">Meus Pedidos</string>
+    <string name="title_activity_lista_estabelecimento">ListaEstabelecimentoActivity</string>
 </resources>

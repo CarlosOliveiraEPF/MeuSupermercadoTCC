@@ -1,6 +1,7 @@
 package com.example.carlosoliveira.meusupermercadotcc.screens;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -50,12 +51,15 @@ public class AddProdutoActivity extends AppCompatActivity {
 
         mEdtIdUser.setText(((Global)getApplication()).getIdUser());
 
-
         mBtExcluir = (Button)findViewById(R.id.btnExcluir);
         mBtSalvar = (Button)findViewById(R.id.btnSalvar);
-        mBtExcluir.setVisibility(View.INVISIBLE);
+        //mBtExcluir.setVisibility(View.INVISIBLE);
 
-        //String teste = ((Global)getApplication()).getIdUser();
+
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab2.setVisibility(View.GONE);
 
         if (getIntent().hasExtra("key")){
             edit = true;
@@ -67,9 +71,23 @@ public class AddProdutoActivity extends AppCompatActivity {
             mEdtQtd.setText(produto.getQtd());
             mEdtIdUser.setText(produto.getIdUser());
 
-            mBtExcluir.setVisibility(View.VISIBLE);
-            mBtSalvar.setVisibility(View.VISIBLE);
+            fab2.setVisibility(View.VISIBLE);
+            //mBtExcluir.setVisibility(View.VISIBLE);
+            //mBtSalvar.setVisibility(View.VISIBLE);
         }
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                salvarProduto(view);
+            }
+        });
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                excluirProduto(view);
+            }
+        });
     }
 
     public void salvarProduto(View view) {

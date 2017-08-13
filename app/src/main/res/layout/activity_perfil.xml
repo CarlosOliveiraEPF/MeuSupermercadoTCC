@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-        app:srcCompat="@drawable/if_download" />
+        app:backgroundTint="@color/md_amber_500"
+        app:srcCompat="@drawable/salvar_disk_t" />
 
 </android.support.design.widget.CoordinatorLayout>
