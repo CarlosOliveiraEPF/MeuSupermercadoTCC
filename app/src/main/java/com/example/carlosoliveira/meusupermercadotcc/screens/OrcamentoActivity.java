@@ -73,18 +73,24 @@ public class OrcamentoActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        menu.add(MENU_ORCAMENTO,MENU_ORCAMENTO,10,"Orçamento");
+        menu.add(MENU_ORCAMENTO,MENU_ORCAMENTO,10,"Submeter Orçamento");
 
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //Toast.makeText(OrcamentoActivity.this,"tamanho... "+prodEscolhidos.size(),Toast.LENGTH_SHORT).show();
         switch (item.getItemId()){
             case MENU_ORCAMENTO:
-                Intent iorcamento = new Intent(OrcamentoActivity.this, ListaEstabelecimentoActivity.class);
-                startActivity(iorcamento);
-                break;
+                if (prodEscolhidos.size()>0){
+                    Intent isubmete = new Intent(OrcamentoActivity.this, ListaEstabelecimentoActivity.class);
+                    startActivity(isubmete);
+                    break;
+                }else{
+                    Toast.makeText(OrcamentoActivity.this,"Não há orçamentos para submeter.",Toast.LENGTH_SHORT).show();
+                }
+
         }
 
         return super.onOptionsItemSelected(item);

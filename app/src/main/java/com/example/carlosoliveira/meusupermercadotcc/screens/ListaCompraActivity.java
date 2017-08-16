@@ -82,8 +82,7 @@ public class ListaCompraActivity extends AppCompatActivity {
 
                 Produto produto = ((ArrayAdapter<Produto>)parent.getAdapter()).getItem(position);
                 prodEscolhidos.add(produto);
-
-                Toast.makeText(getBaseContext(), "Produto selecionado!", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(), "Produto selecionado!", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -149,7 +148,7 @@ public class ListaCompraActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(ListaCompraActivity.this,"Erro",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ListaCompraActivity.this,"Erro",Toast.LENGTH_SHORT).show();
                     }
                 });
         mVolleyQueue.add(req);
@@ -173,7 +172,7 @@ public class ListaCompraActivity extends AppCompatActivity {
                     startActivity(iorcamento);
                     break;
                 }else{
-                    Toast.makeText(ListaCompraActivity.this,"Produtos devem ser selecionados.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ListaCompraActivity.this,"Não há produtos selecionados para compra.",Toast.LENGTH_SHORT).show();
                 }
         }
 

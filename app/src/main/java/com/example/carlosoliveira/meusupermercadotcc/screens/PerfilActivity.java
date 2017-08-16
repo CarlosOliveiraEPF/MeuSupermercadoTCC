@@ -1,8 +1,14 @@
 package com.example.carlosoliveira.meusupermercadotcc.screens;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,6 +20,9 @@ import android.widget.Toast;
 import com.example.carlosoliveira.meusupermercadotcc.BDados.ConfiguraFireBase;
 import com.example.carlosoliveira.meusupermercadotcc.R;
 import com.example.carlosoliveira.meusupermercadotcc.classes.Cliente;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +38,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class PerfilActivity extends AppCompatActivity {
+public class PerfilActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private ProgressBar progressCli;
     private EditText etCEPCli;
     private EditText etLogCli;
@@ -37,13 +46,21 @@ public class PerfilActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etNumCli;
     private EditText etComplCli;
+    public EditText etIdUser;
+    private EditText etLatCli;
+    private EditText etLongCli;
 
     private Cliente cliente;
     private DatabaseReference firebase;
-    public EditText etIdUser;
 
     final ArrayList<Cliente> clinew = new ArrayList<>();
     public Boolean emailExistente=false;
+
+    private GoogleApiClient googleApiClient;
+    private static final String TAG = "logsGPS";
+
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +80,8 @@ public class PerfilActivity extends AppCompatActivity {
         etNumCli = (EditText)findViewById(R.id.edtNumCli);
         etComplCli = (EditText)findViewById(R.id.edtComplCli);
         etIdUser = (EditText) findViewById(R.id.edtIdUser);
+        etLatCli = (EditText) findViewById(R.id.edtLatCli);
+        etLongCli = (EditText) findViewById(R.id.edtLongCli);
 
         firebase = ConfiguraFireBase.getFirebase().child("cliente");
 
@@ -83,16 +102,20 @@ public class PerfilActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 cliente = new Cliente();
+                cliente = new Cliente();
                 cliente.setNome(etNameCli.getText().toString());
                 cliente.setEmail(etEmail.getText().toString());
                 cliente.setCep(etCEPCli.getText().toString());
                 cliente.setLogradouro(etLogCli.getText().toString());
                 cliente.setNumero(etNumCli.getText().toString());
                 cliente.setComplemento(etComplCli.getText().toString());
+                cliente.setLatitude(etLatCli.getText().toString());
+                cliente.setLongitude(etLongCli.getText().toString());
                 ((Global)getApplication()).setEmailuser(cliente.getEmail());
 
                 if (cli.isEmpty()) {
+                    //Toast.makeText(PerfilActivity.this, "Endereço: "+cliente.getLogradouro()+", "+cliente.getNumero(), Toast.LENGTH_LONG).show();
+                    getLatLong(cliente.getLogradouro()+", "+cliente.getNumero());
                     salvarCliente(cliente);
                 } else {
                     cliente.setId(cli.get(0).getId());
@@ -120,6 +143,9 @@ public class PerfilActivity extends AppCompatActivity {
                         etNumCli.setText(cli.get(0).getNumero());
                         etComplCli.setText(cli.get(0).getComplemento());
                         etIdUser.setText(cli.get(0).getId());
+                        etLatCli.setText(cli.get(0).getLatitude());
+                        etLongCli.setText(cli.get(0).getLongitude());
+
                         ((Global) getApplication()).setIdUser(etIdUser.getText().toString());
                     }
                 }
@@ -130,12 +156,46 @@ public class PerfilActivity extends AppCompatActivity {
                 }
             });
         }
+
+        //Se não possui permissão -- Google
+        if (ContextCompat.checkSelfPermission(PerfilActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //Verifica se já mostramos o alerta e o usuário negou alguma vez.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(PerfilActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                //Caso o usuário tenha negado a permissão anteriormente e não tenha marcado o check "nunca mais mostre este alerta"
+
+                //Podemos mostrar um alerta explicando para o usuário porque a permissão é importante.
+                Toast.makeText(
+                        getBaseContext(),
+                        "Você já negou antes essa permissão! " +
+                                "\nPara saber a sua localização necessitamos dessa permissão!",
+                        Toast.LENGTH_LONG).show();
+
+                        /* Além da mensagem indicando a necessidade sobre a permissão,
+                           podemos solicitar novamente a permissão */
+                ActivityCompat.requestPermissions(PerfilActivity.this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            } else {
+                //Solicita a permissão
+                ActivityCompat.requestPermissions(PerfilActivity.this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            }
+        }else {
+
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+
+            googleApiClient.connect();
+
+        }// fecha Google
+
     }//FECHA ONCREATE
 
     // Salva cliente em caso de novo cadastro
     private boolean salvarCliente (Cliente cliente) {
         try {
             firebase.push().setValue(cliente);
+
             //((Global)getApplication()).setIdUser(cliente.getId());
             Toast.makeText(PerfilActivity.this, "Perfil inserido com sucesso. Efetuar login para acesso ao App.", Toast.LENGTH_LONG).show();
             Intent imain = new Intent(PerfilActivity.this, MainActivity.class);
@@ -229,5 +289,145 @@ public class PerfilActivity extends AppCompatActivity {
             return false;
         }
     }// Final existeEmail
+
+
+    // Implementações Google
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        if (ContextCompat.checkSelfPermission(PerfilActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+            Log.d(TAG, "Latitude: " + lastLocation.getLatitude());
+            Log.d(TAG, "Longitude: " + lastLocation.getLongitude());
+
+            latitude = lastLocation.getLatitude();
+            longitude = lastLocation.getLongitude();
+
+            //chamando o método getEndereco
+            // Lat/Long Rua Ney da Gama Ahrends
+            //latitude = -30.045504;
+            //longitude = -51.1333411;
+
+
+            getEndereco(latitude, longitude);
+
+//            Toast.makeText(
+//                    getBaseContext(),
+//                    "Passou aqui...",
+//                    Toast.LENGTH_LONG).show();
+
+            if (etLogCli.getText().toString().length()<1){
+                etLatCli.setText("Latitude x: " + lastLocation.getLatitude());
+                etLongCli.setText("Longitude x: " + lastLocation.getLongitude());
+            }
+
+
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(
+                getBaseContext(),
+                "Conexão falhou!",
+                Toast.LENGTH_LONG).show();
+    }
+
+    public void getEndereco(double lat, double longi){
+        //http://maps.googleapis.com/maps/api/geocode/json?latlng=-26.196223,-52.689523
+        RequestParams params = new RequestParams();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+longi, params, new TextHttpResponseHandler() {
+            @Override
+            public void onStart() {
+                super.onStart();
+                progressCli.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getBaseContext(), "Problema na conexao!"+statusCode, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                // Retorna o JSON que captura a posição da Latitude/Longitude.
+                //Toast.makeText(getBaseContext(),responseString, Toast.LENGTH_LONG).show();
+                progressCli.setVisibility(View.GONE);
+            }
+        });
+    }//fecha getEndereco
+
+    public void getLatLong(String endereco) {
+        String end = cliente.getLogradouro()+", "+cliente.getNumero();
+        RequestParams params = new RequestParams();
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://maps.googleapis.com/maps/api/geocode/json?address=" + end, params, new TextHttpResponseHandler() {
+            //http://maps.googleapis.com/maps/api/geocode/json?address=Rua%20Alcides%20Foresti,%20461-507
+            @Override
+            public void onStart() {
+                super.onStart();
+                progressCli.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getBaseContext(), "Problema na conexao!" + statusCode, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                try {
+
+                    JSONObject obj = new JSONObject(responseString);
+
+                    String resp = obj.toString();
+
+                    Log.d("TAG","puro: "+resp);
+
+                    String lati = resp.substring(resp.indexOf("location") + 17, resp.indexOf("location") + 27);
+                    String longi = resp.substring(resp.indexOf("location") + 35, resp.indexOf("location") + 45);
+
+                    Log.d("TAG","latitude: "+lati);
+                    Log.d("TAG","longitude: "+longi);
+
+                    latitude = Double.parseDouble(lati);
+                    longitude = Double.parseDouble(longi);
+
+//                    Toast.makeText(
+//                            getBaseContext(),
+//                            "Do endereço ... Latitude: " + latitude + "\nLongitude: " + longitude,
+//                            Toast.LENGTH_LONG).show();
+                    etLatCli.setText(lati);
+                    etLogCli.setText(longi);
+                    cliente.setLatitude(lati);
+                    cliente.setLongitude(longi);
+
+                    progressCli.setVisibility(View.INVISIBLE);
+                } catch (JSONException e) {
+
+                }
+                progressCli.setVisibility(View.GONE);
+            }
+        });
+    }//fecha getlatLong
+
+
+
+
+
+
+
+
+
 
 }// Final PerfilActivity

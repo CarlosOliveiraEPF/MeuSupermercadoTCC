@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MeuSupermercadoTCC</string>
+    <string name="app_name">MeuSupermercado</string>
     <string name="title_activity_main">MeuSupermercado</string>
     <string name="title_activity_estabelecimento">Estabelecimento</string>
     <string name="title_activity_cliente">Área Cliente</string>
@@ -8,4 +8,5 @@
     <string name="title_activity_orcamento">Orçamento</string>
     <string name="title_activity_pedido">Meus Pedidos</string>
     <string name="title_activity_lista_estabelecimento">ListaEstabelecimentoActivity</string>
+    <string name="title_activity_sobre">Sobre MeuSupermercado</string>
 </resources>

@@ -77,8 +77,7 @@ public class ListaEstabelecimentoActivity extends AppCompatActivity {
 
                 Estabelecimento estabelecimento = ((ArrayAdapter<Estabelecimento>)parent.getAdapter()).getItem(position);
                 estEscolhidos.add(estabelecimento);
-
-                Toast.makeText(getBaseContext(), "Estabelecimento selecionado!", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(), "Estabelecimento selecionado!", Toast.LENGTH_LONG).show();
             }
         });
 

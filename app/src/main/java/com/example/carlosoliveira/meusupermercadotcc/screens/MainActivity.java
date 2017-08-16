@@ -71,11 +71,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(),"Email global: "+((Global)getApplication()).getEmailuser(),Toast.LENGTH_LONG).show();
-
                 // Trestando a existência do e-mail na base de dados.
                 etEmailUser = (EditText)findViewById(R.id.edtUserEmail);
-
                 firebase.orderByChild("email").equalTo(etEmailUser.getText().toString()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -89,16 +86,15 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("CLIENTES", "CLIENTES: " + cli.get(0).toString());
                             ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
                             ((Global) getApplication()).setIdUser(cli.get(0).getId());
-                            //Toast.makeText(getBaseContext(),"Email: "+((Global)getApplication()).getEmailuser()+" Id: "+((Global)getApplication()).getIdUser().toString(),Toast.LENGTH_LONG).show();
                             Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
                             startActivity(icliente);
                             fab.setVisibility(View.GONE);
-                            fab2.setVisibility(View.VISIBLE);
+                            //fab2.setVisibility(View.VISIBLE);
                             ((Global) getApplication()).setLogin(true);
 
                         }else{
                             etEmailUser.setText("");
-                            Toast.makeText(getBaseContext(),"Usuário não cadastrado.",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(),"Usuário não cadastrado. Informe seu email cadastrado ou acesse o menu para efetuar seu cadastro.",Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -129,9 +125,8 @@ public class MainActivity extends AppCompatActivity {
         //####################### SÓ O CABEÇALHO #######################
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.meusuper15famb)
+                .withHeaderBackground(R.drawable.meusuper15famb_pq)
                 .addProfiles(
-                        //new ProfileDrawerItem().withName("Thiago Cury").withEmail("thiagocury@gmail.com").withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener(){
                     @Override
@@ -151,26 +146,59 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         //SecondaryDrawerItem()
                         new PrimaryDrawerItem().withName("Cliente").withIdentifier(0).withIcon(R.mipmap.ic_launcher_person),
-                        new PrimaryDrawerItem().withName("Estabelecimento").withIdentifier(1).withIcon(R.mipmap.ic_launcher_mall)
+                        new PrimaryDrawerItem().withName("Estabelecimento").withIdentifier(1).withIcon(R.mipmap.ic_launcher_mall),
+                        new PrimaryDrawerItem().withName("Sobre").withIdentifier(2).withIcon(R.mipmap.ic_info),
+                        new PrimaryDrawerItem().withName("Sair").withIdentifier(3).withIcon(R.mipmap.ic_exit)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (!((Global) getApplication()).getLogin()) {
-                            switch ((int)drawerItem.getIdentifier()){
-                                case 0:
+                        switch ((int)drawerItem.getIdentifier()){
+                            case 0:
+                                if (!((Global) getApplication()).getLogin()) {
                                     Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
                                     startActivity(icliente);
                                     break;
-                                case 1:
+                                }else{
+                                    Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                }
+                            case 1:
+                                if (!((Global) getApplication()).getLogin()) {
                                     Intent iestabelecimento = new Intent(MainActivity.this, EstabelecimentoActivity.class);
                                     startActivity(iestabelecimento);
                                     break;
-                            }
-                        }else{
-                            Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                }else{
+                                    Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                }
+
+                            case 2:
+                                if (!((Global) getApplication()).getLogin()) {
+                                    Intent isobre = new Intent(MainActivity.this, SobreActivity.class);
+                                    startActivity(isobre);
+                                    break;
+                                }else{
+                                    Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                }
+
+                            case 3:
+                                if (((Global) getApplication()).getLogin()) {
+                                    etEmailUser.setText("");
+                                    ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
+                                    ((Global)getApplication()).setIdUser(etEmailUser.getText().toString());
+
+                                    Toast.makeText(getBaseContext(),"Você está desconectado.",Toast.LENGTH_LONG).show();
+                                    fab2.setVisibility(View.GONE);
+                                    fab.setVisibility(View.VISIBLE);
+                                    ((Global) getApplication()).setLogin(false);
+                                    break;
+
+                                }else{
+                                    Toast.makeText(getBaseContext(),"Usuário não efetuou login.",Toast.LENGTH_LONG).show();
+                                }
+                                //Intent isair = new Intent(MainActivity.this, SobreActivity.class);
+                                //startActivity(isair);
                         }
-                        return false;
+                     return false;
 
                     }
                 }).build();

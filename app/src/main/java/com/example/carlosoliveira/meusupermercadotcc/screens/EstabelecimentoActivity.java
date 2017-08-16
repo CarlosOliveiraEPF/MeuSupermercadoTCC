@@ -2,7 +2,6 @@ package com.example.carlosoliveira.meusupermercadotcc.screens;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -25,16 +24,11 @@ import com.example.carlosoliveira.meusupermercadotcc.classes.Estabelecimento;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -121,6 +115,10 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                 estabelecimento.setLogradouro(etLog.getText().toString());
                 estabelecimento.setNumero(etNumEst.getText().toString());
                 estabelecimento.setComplemento(etComplEst.getText().toString());
+
+                //Toast.makeText(getBaseContext(),estabelecimento.getLogradouro()+", "+estabelecimento.getNumero(), Toast.LENGTH_LONG).show();
+                getLatLong(estabelecimento.getLogradouro()+", "+estabelecimento.getNumero());
+
                 if(est.isEmpty()) {
                     salvarEstabelecimento(estabelecimento);
                     clearEstabelecimento();
@@ -251,20 +249,7 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
                         etLog.setText(obj.getString("logradouro"));
                         if(etLog.length()<1){
                             Toast.makeText(getBaseContext(), "CEP não especifico de um logradouro. Favor preencher o campo."+statusCode, Toast.LENGTH_LONG).show();
-                        }//else{
-                           // Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
-                            //getEndereco(0,0,etLog.getText().toString());
-                       // }
-//                        retorno += "\n" + obj.getString("cep");
-//                        retorno += "\n" + obj.getString("logradouro");
-//                        retorno += "\n" + obj.getString("complemento");
-//                        retorno += "\n" + obj.getString("bairro");
-//                        retorno += "\n" + obj.getString("localidade");
-//                        retorno += "\n" + obj.getString("uf");
-//                        retorno += "\n" + obj.getString("ibge");
-//                        retorno += "\n" + obj.getString("gia");
-//
-//                        Toast.makeText(getBaseContext(),"Dados retornados: "+retorno, Toast.LENGTH_LONG).show();
+                        }
                     }
                     progress.setVisibility(View.INVISIBLE);
                 }catch(JSONException e){
@@ -281,8 +266,8 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
 
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-            Log.d(TAG, "Latitude: " + lastLocation.getLatitude());
-            Log.d(TAG, "Longitude: " + lastLocation.getLongitude());
+            Log.d(TAG, "Latitude Atual: " + lastLocation.getLatitude());
+            Log.d(TAG, "Longitude Atual: " + lastLocation.getLongitude());
 
             latitude = lastLocation.getLatitude();
             longitude = lastLocation.getLongitude();
@@ -291,6 +276,8 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
             // Lat/Long Rua Ney da Gama Ahrends
             //latitude = -30.045504;
             //longitude = -51.1333411;
+
+
             getEndereco(latitude, longitude);
 
             tvLatitude.setText("Latitude: " + lastLocation.getLatitude());
@@ -318,10 +305,6 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+longi, params, new TextHttpResponseHandler() {
-        //client.get("http://maps.google.com/maps/api/geocode/json?address="+logradouro, params, new TextHttpResponseHandler() {
-                    //http://maps.google.com/maps/api/geocode/json?address=rua+ney+gama+ahrends+295+prot%C3%A1sio,+portoalegre+-+rs&sensor=false
-
-
             @Override
             public void onStart() {
                 super.onStart();
@@ -335,38 +318,62 @@ public class EstabelecimentoActivity extends AppCompatActivity implements Google
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
-                //aqui que retorna a lat e long.
-                //Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
-
-/*
-                try {
-                    JSONObject objGps = new JSONObject(responseString);
-
-                    String retorno = "";
-                    retorno = objGps.getString("short_name");
-                    Toast.makeText(getBaseContext(),retorno, Toast.LENGTH_LONG).show();
-//
-//                    if (!obj.has("erro")) {
-//                        etLog.setText(obj.getString("logradouro"));
-//                        if(etLog.length()<1){
-//                            Toast.makeText(getBaseContext(), "CEP não especifico de um logradouro. Favor preencher o campo."+statusCode, Toast.LENGTH_LONG).show();
-//                        }else{
-//                            Toast.makeText(getBaseContext(), "Logradouro: "+etLog.getText().toString(), Toast.LENGTH_LONG).show();
-//                            getEndereco(0,0,etLog.getText().toString());
-//                        }
-//                    }
-//                    progress.setVisibility(View.INVISIBLE);
-                }catch(JSONException e){
-
-                }
-*/
-                Toast.makeText(getBaseContext(),responseString, Toast.LENGTH_LONG).show();
-
+                //Toast.makeText(getBaseContext(),responseString, Toast.LENGTH_LONG).show();
                 progress.setVisibility(View.GONE);
             }
         });
-    }//fecha Implementações google
+    }//fecha getEndereco
+
+    public void getLatLong(String endereco) {
+        RequestParams params = new RequestParams();
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://maps.googleapis.com/maps/api/geocode/json?address=" + endereco, params, new TextHttpResponseHandler() {
+            //http://maps.googleapis.com/maps/api/geocode/json?address=Rua%20Alcides%20Foresti,%20461-507
+            @Override
+            public void onStart() {
+                super.onStart();
+                progress.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getBaseContext(), "Problema na conexao!" + statusCode, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                try {
+
+                    JSONObject obj = new JSONObject(responseString);
+
+                    String resp = obj.toString();
+
+                    Log.d("TAG","puro: "+resp);
+
+                    String lati = resp.substring(resp.indexOf("location") + 17, resp.indexOf("location") + 27);
+                    String longi = resp.substring(resp.indexOf("location") + 35, resp.indexOf("location") + 45);
+
+                    Log.d("TAG","latitude do Endereço Estabelecimento: "+lati);
+                    Log.d("TAG","longitude do Endereço Estabelecimento: "+longi);
+
+                    latitude = Double.parseDouble(lati);
+                    longitude = Double.parseDouble(longi);
+
+//                    Toast.makeText(
+//                            getBaseContext(),
+//                            "Do endereço ... Latitude: " + latitude + "\nLongitude: " + longitude,
+//                            Toast.LENGTH_LONG).show();
+
+                    progress.setVisibility(View.INVISIBLE);
+                } catch (JSONException e) {
+
+                }
+                progress.setVisibility(View.GONE);
+            }
+        });
+    }//fecha getlatLong
+
 
 
 }//fecha EstabelecimentoActivity

@@ -13,6 +13,8 @@ public class Cliente {
     private String logradouro;
     private String numero;
     private String complemento;
+    private String latitude;
+    private String longitude;
 
     public String getId() {
         return id;
@@ -68,6 +70,22 @@ public class Cliente {
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     @Override
