@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                             ((Global) getApplication()).setIdUser(cli.get(0).getId());
                             Intent icliente = new Intent(MainActivity.this, ClienteActivity.class);
                             startActivity(icliente);
-                            fab.setVisibility(View.GONE);
+                            //fab.setVisibility(View.GONE);
                             //fab2.setVisibility(View.VISIBLE);
                             ((Global) getApplication()).setLogin(true);
 
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         //####################### SÓ O CABEÇALHO #######################
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.meusuper15famb_pq)
+                .withHeaderBackground(R.drawable.fundo_menu)
                 .addProfiles(
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener(){
@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 }else{
                                     Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                    break;
                                 }
                             case 1:
                                 if (!((Global) getApplication()).getLogin()) {
@@ -169,34 +170,28 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 }else{
                                     Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
+                                    break;
                                 }
 
                             case 2:
-                                if (!((Global) getApplication()).getLogin()) {
                                     Intent isobre = new Intent(MainActivity.this, SobreActivity.class);
                                     startActivity(isobre);
                                     break;
-                                }else{
-                                    Toast.makeText(getBaseContext(),"Área de acesso para novos Clientes/Estabelecimento.",Toast.LENGTH_LONG).show();
-                                }
 
                             case 3:
                                 if (((Global) getApplication()).getLogin()) {
                                     etEmailUser.setText("");
+                                    fab.setVisibility(View.VISIBLE);
                                     ((Global)getApplication()).setEmailuser(etEmailUser.getText().toString());
                                     ((Global)getApplication()).setIdUser(etEmailUser.getText().toString());
-
-                                    Toast.makeText(getBaseContext(),"Você está desconectado.",Toast.LENGTH_LONG).show();
-                                    fab2.setVisibility(View.GONE);
-                                    fab.setVisibility(View.VISIBLE);
                                     ((Global) getApplication()).setLogin(false);
+                                    Toast.makeText(getBaseContext(),"Você está desconectado.",Toast.LENGTH_LONG).show();
                                     break;
 
                                 }else{
                                     Toast.makeText(getBaseContext(),"Usuário não efetuou login.",Toast.LENGTH_LONG).show();
+                                    break;
                                 }
-                                //Intent isair = new Intent(MainActivity.this, SobreActivity.class);
-                                //startActivity(isair);
                         }
                      return false;
 

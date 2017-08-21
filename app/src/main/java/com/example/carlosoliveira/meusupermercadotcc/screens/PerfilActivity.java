@@ -116,7 +116,12 @@ public class PerfilActivity extends AppCompatActivity  implements GoogleApiClien
                 if (cli.isEmpty()) {
                     //Toast.makeText(PerfilActivity.this, "Endereço: "+cliente.getLogradouro()+", "+cliente.getNumero(), Toast.LENGTH_LONG).show();
                     getLatLong(cliente.getLogradouro()+", "+cliente.getNumero());
-                    salvarCliente(cliente);
+                    if (cliente.getEmail().isEmpty()){
+                        Toast.makeText(PerfilActivity.this, "Campo e-mail obrigatório..", Toast.LENGTH_LONG).show();
+                        etEmail.requestFocus();
+                    }else{
+                        salvarCliente(cliente);
+                    }
                 } else {
                     cliente.setId(cli.get(0).getId());
                     salvarClienteAlterar(cliente);
@@ -408,7 +413,7 @@ public class PerfilActivity extends AppCompatActivity  implements GoogleApiClien
 //                            "Do endereço ... Latitude: " + latitude + "\nLongitude: " + longitude,
 //                            Toast.LENGTH_LONG).show();
                     etLatCli.setText(lati);
-                    etLogCli.setText(longi);
+                    etLongCli.setText(longi);
                     cliente.setLatitude(lati);
                     cliente.setLongitude(longi);
 

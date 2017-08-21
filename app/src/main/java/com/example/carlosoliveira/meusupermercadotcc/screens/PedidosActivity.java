@@ -174,7 +174,7 @@ public class PedidosActivity extends AppCompatActivity {
                                     android.R.layout.simple_list_item_1, pedidos);
                             mListView.setAdapter(adapter);
                             mRefresh.setRefreshing(false);
-                            YoYo.with(Techniques.ZoomIn).playOn(mRefresh);
+                            //YoYo.with(Techniques.ZoomIn).playOn(mRefresh);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
